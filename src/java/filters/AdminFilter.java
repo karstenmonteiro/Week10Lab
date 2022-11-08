@@ -1,5 +1,6 @@
 package filters;
 
+import dataaccess.UserDB;
 import java.io.IOException;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -8,6 +9,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 /**
@@ -24,6 +26,18 @@ public class AdminFilter implements Filter {
             // code that is executed before the servlet
             HttpServletRequest httpRequest = (HttpServletRequest)request;
             HttpSession session = httpRequest.getSession();
+            String email = (String)session.getAttribute("email");
+            
+            // get the user's roleId
+            UserDB userDB = new UserDB();
+            int roleId = userDB.get(email).getRole().getRoleId();
+            
+            if (roleId != 1) {
+                HttpServletResponse httpResponse = (HttpServletResponse)response;
+                httpResponse.sendRedirect("notes");
+                
+                return;
+            }
             
             // execute the servlet
             chain.doFilter(request, response);
